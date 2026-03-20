@@ -14,7 +14,7 @@ Create a new document from the “Job Offer Letter Template”, add a new recipi
 - Recipient:
   - First name: **Jonn**
   - Last name: **Doe**
-  - Email: **wd_tester@mailinator.com**
+  - Email: randomized Mailinator address like **wd_tester_123456789012@mailinator.com**
   - Phone: *(leave empty)*
 
 ## Steps (Happy Path)
@@ -27,7 +27,7 @@ Create a new document from the “Job Offer Letter Template”, add a new recipi
 7. In the **Create new recipient** dialog:
    1. Fill **First name** with **Jonn**.
    2. Fill **Last name** with **Doe**.
-   3. Fill **Email** with **wd_tester@mailinator.com**.
+   3. Fill **Email** with a randomized Mailinator address like **wd_tester_123456789012@mailinator.com**.
    4. Leave **Phone number** empty.
    5. Click **Create**.
 8. Click **Review and send**.
@@ -36,6 +36,9 @@ Create a new document from the “Job Offer Letter Template”, add a new recipi
 11. Click **Send document**.
 12. Verify the **Document has been sent** dialog appears.
 13. Click the **Close (X)** icon on the dialog.
+14. Extract document links using Mailinator
+15. Navigate to the document link and sign
+16. Verify signer received completed email using Mailinator
 
 ## Expected Results
 - The document can be created from the selected template and proceeds to the send flow.

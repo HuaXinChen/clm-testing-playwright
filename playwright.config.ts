@@ -5,7 +5,7 @@ const baseURL = process.env.BASE_URL ?? "https://app.pandadoc.com";
 
 export default defineConfig({
   testDir: "./e2e",
-  timeout: 60_000,
+  timeout: 120_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,
   forbidOnly: !!process.env.CI,

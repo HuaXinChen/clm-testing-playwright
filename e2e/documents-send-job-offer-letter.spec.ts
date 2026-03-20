@@ -1,10 +1,25 @@
 import { test, expect } from "@playwright/test";
 import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
+import {
+  extractDocumentLinksFromLatestMailinatorEmail,
+  waitForMailinatorEmailSubject
+} from "./helpers/mailinator";
+import { randomInt } from "node:crypto";
 
 // spec: specs/documents-send-job-offer-letter.md
 // seed: e2e/seed.spec.ts
 
 const authStatePath = getAuthStatePath();
+
+async function acceptCookiesIfPresent(page: import("@playwright/test").Page): Promise<void> {
+  const acceptButton = page.locator("#onetrust-accept-btn-handler");
+  try {
+    await acceptButton.waitFor({ state: "visible", timeout: 5_000 });
+    await acceptButton.click();
+  } catch {
+    // Cookie banner isn't always present; ignore.
+  }
+}
 
 test.describe("Send “Job Offer Letter Template” Document to a New Recipient", () => {
   const { skip, reason } = getAuthSkip(authStatePath);
@@ -16,14 +31,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     const base = (baseURL ?? "https://app.pandadoc.com").replace(/\/+$/, "");
     await page.goto(`${base}`, { waitUntil: "domcontentloaded" });
 
-    // Accept cookies if the banner appears
-    const acceptButton = page.locator('#onetrust-accept-btn-handler');
-    try {
-      await acceptButton.waitFor({ state: 'visible', timeout: 5000 });
-      await acceptButton.click();
-    } catch (e) {
-      console.log('Accept button not found, skipping...');
-    }
+    await acceptCookiesIfPresent(page);
 
     // 1. In the left navigation, click Documents.
     await page
@@ -47,6 +55,9 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
     // 5. In the document name field, enter Job Offer Letter for John Doe.
     const documentName = "Job Offer Letter for John Doe";
+    const mailinatorSuffix = String(randomInt(0, 1_000_000_000_000)).padStart(12, "0");
+    const mailinatorInbox = `wd_tester_${mailinatorSuffix}`;
+    const recipientEmail = `${mailinatorInbox}@mailinator.com`;
     await page
       .getByTestId('document-name-wizard')
       .locator('input')
@@ -70,12 +81,12 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await createRecipientDialog.getByTestId('lastName').locator('input').fill("Doe");
     const emailInput = createRecipientDialog.locator('input[name^="searchField"]').first();
     await emailInput.click();
-    await emailInput.fill('wd_tester@mailinator.com');
-    await page.waitForResponse(response =>
-      response.url().includes('/contacts') && response.status() === 200
+    await emailInput.fill(recipientEmail);
+    await page.waitForResponse(
+      (response) => response.url().includes("/contacts") && response.status() === 200,
+      { timeout: 10_000 }
     );
     await emailInput.press('Enter');
-    await createRecipientDialog.getByRole("button", { name: 'Create' }).click();
     await page.getByTestId('add_recipients_step__continue_button').click();
     
     // Wait for the editor iframe to load and become visible
@@ -97,10 +108,74 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
     // 12. Verify the Document has been sent dialog appears.
     const sentDialog = frameHandle.getByRole("dialog").filter({ hasText: /Document has been sent/i });
-    await expect(sentDialog).toBeVisible({ timeout: 60_000 });
+    await expect(sentDialog).toBeVisible({ timeout: 30_000 });
 
     // 13. Click the Close (X) icon on the dialog.
     await sentDialog.getByTestId('close-dialog').click();
     await expect(sentDialog).toBeHidden();
+    
+    // 14. Extract document links using Mailinator.
+    const mailPage = await page.context().newPage();
+    let documentUrl: string;
+    try {
+      // Mailinator can truncate the subject with "...", so avoid matching the full document name.
+      // Expected subject shape: "[sender] sent you [document name]".
+      const stablePrefixWords = documentName.split(/\s+/).filter(Boolean).slice(0, 3);
+      const escapedPrefix = stablePrefixWords
+        .map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+        .join(String.raw`\s+`);
+      const subjectRegex = new RegExp(String.raw`sent you[\s\S]*${escapedPrefix}`, "i");
+
+      const links = await extractDocumentLinksFromLatestMailinatorEmail(mailPage, {
+        inbox: mailinatorInbox,
+        timeoutMs: 120_000,
+        subject: { type: "regex", value: subjectRegex },
+        link: { type: "regex", value: /https:\/\/app\.pandadoc\.com\/document\/v2\?token=/i }
+      });
+
+      documentUrl = links[0]!;
+    } finally {
+      await mailPage.close();
+    }
+
+    // 15. Navigate to the document link and sign.
+    const signingPage = await page.context().newPage();
+    await signingPage.goto(documentUrl, { waitUntil: "domcontentloaded" });
+
+    await acceptCookiesIfPresent(signingPage);
+
+    // Best-effort signing flow (public token link pages can vary slightly).
+    await signingPage.getByTestId('info-bar-action-button').click();
+    
+    // Try to adopt/confirm a signature if prompted.
+    await signingPage.getByTestId('signature-field').click();
+    
+    // Try to click Accept and sign button
+    await signingPage.locator('#dialogPrimaryButton').click();
+
+    // Wait for response from /field-image/upload
+    await signingPage.waitForResponse(
+      (response) => response.url().includes("/field-image/upload") && response.status() === 200,
+      { timeout: 10_000 }
+    );
+
+    // Click Finish button
+    await signingPage.getByTestId('info-bar-action-button').click();
+
+    // Assert we didn't land on an error page.
+    await expect(signingPage.getByTestId('empty-state-title')).toHaveText('All set — this document is complete!');
+    await signingPage.close();
+
+    // 16. Verify signer received completed email using Mailinator.
+    const completedMailPage = await page.context().newPage();
+    try {
+      await waitForMailinatorEmailSubject(completedMailPage, {
+        inbox: mailinatorInbox,
+        timeoutMs: 120_000,
+        subject: { type: "contains", value: "document has been completed" }
+      });
+    } finally {
+      await completedMailPage.close();
+    }
   });
 });
