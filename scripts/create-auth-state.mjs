@@ -6,7 +6,7 @@ import path from "node:path";
 const baseURL = process.env.BASE_URL ?? "https://app.pandadoc.com";
 const authPath = process.env.AUTH_STATE_PATH ?? "auth.json";
 
-const dashboardUrlPattern = process.env.DASHBOARD_URL_PATTERN ?? "**/dashboard**";
+const dashboardUrlPattern = process.env.DASHBOARD_URL_PATTERN ?? "**/discover**";
 const channel = process.env.BROWSER_CHANNEL ?? "chrome";
 const userDataDir = process.env.USER_DATA_DIR ?? "playwright/.user-data";
 
