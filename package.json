@@ -1,0 +1,21 @@
+{
+  "name": "clm-testing-playwright",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Playwright tests for PandaDoc (app.pandadoc.com) CLM flows",
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "auth": "node scripts/create-auth-state.mjs",
+    "test:auth": "playwright test e2e/authenticated.spec.ts",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen $BASE_URL"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^22.13.0",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.8.0"
+  }
+}
