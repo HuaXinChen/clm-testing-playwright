@@ -1,30 +1,14 @@
 import { test, expect } from "@playwright/test";
-import { existsSync, readFileSync } from "node:fs";
+import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
 
 // spec: specs/documents-send-job-offer-letter.md
 // seed: e2e/seed.spec.ts
 
-const authStatePath = process.env.AUTH_STATE_PATH ?? "auth.json";
-
-function storageStateHasCookies(filePath: string): boolean {
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as { cookies?: unknown };
-    return Array.isArray((parsed as any).cookies) && (parsed as any).cookies.length > 0;
-  } catch {
-    return false;
-  }
-}
+const authStatePath = getAuthStatePath();
 
 test.describe("Send “Job Offer Letter Template” Document to a New Recipient", () => {
-  test.skip(
-    !existsSync(authStatePath),
-    `Missing auth state at ${authStatePath}. Run \`npm run auth\` first.`
-  );
-  test.skip(
-    existsSync(authStatePath) && !storageStateHasCookies(authStatePath),
-    `${authStatePath} exists but has no cookies. Re-run \`npm run auth\` to regenerate it.`
-  );
+  const { skip, reason } = getAuthSkip(authStatePath);
+  test.skip(skip, reason);
 
   test.use({ storageState: authStatePath });
 
@@ -99,12 +83,9 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await frameHandle.locator('body').waitFor();
 
     // 8. Click Review and send.
-    //await page.locator('//button[text()="Review and send"]').click();
-    await frameHandle.locator('//button[text()="Review and send"]').click();
-    
+    await frameHandle.getByTestId('split-main-button').click();
 
     // 9. When prompted about variables, select Do not replace (variables will be displayed) and click Continue.
-    //await page.getByLabel('Do not replace (variables will be displayed)').check();
     await frameHandle.locator('//span[contains(., "Do not replace")]').click();
     await frameHandle.getByRole('button', { name: 'Continue' }).click();
 
@@ -123,4 +104,3 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await expect(sentDialog).toBeHidden();
   });
 });
-

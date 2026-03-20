@@ -1,28 +1,10 @@
 import { test, expect } from "@playwright/test";
-import { existsSync, readFileSync } from "node:fs";
-
-const authStatePath = process.env.AUTH_STATE_PATH ?? "auth.json";
-const hasAuthState = existsSync(authStatePath);
-
-function storageStateHasCookies(filePath: string): boolean {
-  try {
-    const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as { cookies?: unknown };
-    return Array.isArray((parsed as any).cookies) && (parsed as any).cookies.length > 0;
-  } catch {
-    return false;
-  }
-}
+import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
 
 test.describe("authenticated", () => {
-  test.skip(
-    !hasAuthState,
-    `Missing auth state at ${authStatePath}. Run \`npm run auth\` first.`
-  );
-  test.skip(
-    hasAuthState && !storageStateHasCookies(authStatePath),
-    `${authStatePath} exists but has no cookies. Re-run \`npm run auth\` to regenerate it.`
-  );
+  const authStatePath = getAuthStatePath();
+  const { skip, reason } = getAuthSkip(authStatePath);
+  test.skip(skip, reason);
   test.use({ storageState: authStatePath });
 
   test("authenticated session reaches app without login prompt", async ({ page, baseURL }) => {
