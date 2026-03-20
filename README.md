@@ -23,6 +23,7 @@ This repo’s auth flow is **manual Google sign-in** in a headed browser, then t
 
 Before running `npm run auth`:
 
+- Create a local `.env` (recommended): `cp .env.example .env`
 - Install **Google Chrome** locally (recommended).
 - If your org enforces 2FA, device approval, or reCAPTCHA, be ready to complete it in the opened browser window.
 - If Google sign-in loops or pages render blank, temporarily allow third-party cookies for `accounts.google.com` / `app.pandadoc.com` in Chrome settings and retry.
@@ -32,6 +33,19 @@ Run the interactive auth script (opens a headed browser):
 ```bash
 npm run auth
 ```
+
+#### Creating a new PandaDoc account with Google (first-time login)
+
+If you’re starting from a brand-new PandaDoc account, complete the onboarding in the opened browser:
+
+1) Run `npm run auth`
+2) Choose **Google Login**
+3) Sign in with your Google account
+4) Choose the **Free** plan
+5) Choose **Job Offer Letter Template**
+6) When the browser lands on the **Discover** page, the auth session is saved to `auth.json`
+
+Note: the auth script saves state when the URL matches `DASHBOARD_URL_PATTERN` from `.env`. If your tenant lands on Discover, set `DASHBOARD_URL_PATTERN=**/a/#/discover**` and re-run `npm run auth`.
 
 If Google shows “This browser or app may not be secure”, ensure you’re using real Chrome:
 
