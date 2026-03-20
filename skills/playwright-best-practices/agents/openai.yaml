@@ -1,0 +1,7 @@
+interface:
+  display_name: "Playwright Best Practices"
+  short_description: "Reliable Playwright test guidance"
+  default_prompt: "Use $playwright-best-practices to review and improve this Playwright automation project for stability, maintainability, and CI reliability."
+
+policy:
+  allow_implicit_invocation: true
