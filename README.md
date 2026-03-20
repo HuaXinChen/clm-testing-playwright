@@ -1,3 +1,25 @@
+## Overview
+
+This project demonstrates an end-to-end test strategy for a Contract Lifecycle Management (CLM) workflow using Playwright.
+
+It focuses on validating complex, asynchronous document workflows including:
+- Document creation from templates
+- Dynamic recipient handling
+- Email-based verification (Mailinator)
+- Document signing flows
+
+## Key Testing Strategies
+
+- **Resilient selectors** using role-based and test-id locators
+- **Async validation** using network interception and email polling
+- **End-to-end workflow validation** across multiple systems (UI + email)
+- **State reuse** via authenticated session storage
+
+## Why this matters
+
+CLM platforms involve distributed workflows and external dependencies (email delivery, document rendering, signing flows).  
+This project demonstrates how to validate such systems reliably in an automated pipeline.
+
 # clm-testing-playwright
 
 Playwright test project for `https://app.pandadoc.com/` (PandaDoc CLM).
