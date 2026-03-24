@@ -162,3 +162,9 @@ Avoid:
 
 - Committing traces/videos (unless you intentionally store them as build artifacts only).
 - Leaking tenant URLs, credentials, or tokens in logs. Redact where necessary.
+
+Code quality:
+
+- Let Prettier handle formatting (run `npm run format`).
+- Let ESLint handle code quality (run `npm run lint`).
+- Do not enable ESLint rules that fight Prettier; prefer `eslint-config-prettier`.

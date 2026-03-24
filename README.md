@@ -46,6 +46,11 @@ Default endpoints live in `env.json` (override with `.env` if needed):
 - PandaDoc base URL: `BASE_URL`
 - Mailinator base URL: `MAILINATOR_BASE_URL`
 
+## Formatting and linting
+
+- Format (Prettier): `npm run format` (check-only: `npm run format:check`)
+- Lint (ESLint): `npm run lint` (auto-fix: `npm run lint:fix`)
+
 ## Allure reporting
 
 1) Run tests (Allure results are written to `allure-results/`):
