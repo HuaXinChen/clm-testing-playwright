@@ -1,7 +1,8 @@
 import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
+import { getEnvConfig } from "./env";
 
-const baseURL = process.env.BASE_URL ?? "https://app.pandadoc.com";
+const baseURL = getEnvConfig().pandadocBaseUrl;
 
 export default defineConfig({
   testDir: "./e2e",

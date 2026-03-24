@@ -1,4 +1,5 @@
 import type { Page } from "@playwright/test";
+import { getEnvConfig } from "../../env";
 
 export type MailinatorLinkMatch =
   | { type: "contains"; value: string }
@@ -25,7 +26,8 @@ function uniq(values: string[]): string[] {
 }
 
 export function getMailinatorPublicInboxUrl(inbox: string): string {
-  return `https://www.mailinator.com/v4/public/inboxes.jsp?to=${encodeURIComponent(inbox)}`;
+  const baseUrl = getEnvConfig().mailinatorBaseUrl;
+  return `${baseUrl}/v4/public/inboxes.jsp?to=${encodeURIComponent(inbox)}`;
 }
 
 function getBySubjectText(page: Page, matcher: MailinatorLinkMatch): ReturnType<Page["getByText"]> {

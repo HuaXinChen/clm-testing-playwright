@@ -39,6 +39,13 @@ npx playwright install --with-deps
 npm test smoke.spec.ts
 ```
 
+## Environment URLs
+
+Default endpoints live in `env.json` (override with `.env` if needed):
+
+- PandaDoc base URL: `BASE_URL`
+- Mailinator base URL: `MAILINATOR_BASE_URL`
+
 ## Allure reporting
 
 1) Run tests (Allure results are written to `allure-results/`):
