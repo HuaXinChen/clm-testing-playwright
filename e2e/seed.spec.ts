@@ -11,7 +11,10 @@ test.describe("seed", () => {
   test("seed: authenticated user lands on dashboard", async ({ page, baseURL }) => {
     const testInfo = test.info();
     testInfo.annotations.push({ type: "feature", description: "Feature: Environment" });
-    testInfo.annotations.push({ type: "scenario", description: "Scenario: Seed prerequisites for e2e flows" });
+    testInfo.annotations.push({
+      type: "scenario",
+      description: "Scenario: Seed prerequisites for e2e flows"
+    });
     testInfo.annotations.push({
       type: "gherkin",
       description:

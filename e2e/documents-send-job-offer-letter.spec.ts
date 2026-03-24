@@ -27,7 +27,10 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
   test.use({ storageState: authStatePath });
 
-  test("send Job Offer Letter template to new recipient and complete signing", async ({ page, baseURL }) => {
+  test("send Job Offer Letter template to new recipient and complete signing", async ({
+    page,
+    baseURL
+  }) => {
     const testInfo = test.info();
     testInfo.annotations.push({ type: "feature", description: "Feature: Documents - Sending" });
     testInfo.annotations.push({
@@ -70,27 +73,23 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     const mailinatorSuffix = String(randomInt(0, 1_000_000_000_000)).padStart(12, "0");
     const mailinatorInbox = `wd_tester_${mailinatorSuffix}`;
     const recipientEmail = `${mailinatorInbox}@mailinator.com`;
-    await page
-      .getByTestId('document-name-wizard')
-      .locator('input')
-      .fill(documentName);
+    await page.getByTestId("document-name-wizard").locator("input").fill(documentName);
 
     // 6. Click into the Add recipient text box.
-    await page
-      .getByTestId('person-actor-card')
-      .locator('input')
-      .click();
+    await page.getByTestId("person-actor-card").locator("input").click();
 
     await page
-      .getByTestId('dropdown-menu')
-      .getByRole('button', { name: /create new recipient/i })
+      .getByTestId("dropdown-menu")
+      .getByRole("button", { name: /create new recipient/i })
       .click();
 
     // 7. In the Create new recipient dialog: fill First name, Last name, Email, leave Phone number empty, click Create.
-    const createRecipientDialog = page.getByRole('dialog').filter({ hasText: 'Create new recipient' });
+    const createRecipientDialog = page
+      .getByRole("dialog")
+      .filter({ hasText: "Create new recipient" });
     await expect(createRecipientDialog).toBeVisible();
-    await createRecipientDialog.getByTestId('firstName').locator('input').fill('John');
-    await createRecipientDialog.getByTestId('lastName').locator('input').fill("Doe");
+    await createRecipientDialog.getByTestId("firstName").locator("input").fill("John");
+    await createRecipientDialog.getByTestId("lastName").locator("input").fill("Doe");
     const emailInput = createRecipientDialog.locator('input[name^="searchField"]').first();
     await emailInput.click();
     await emailInput.fill(recipientEmail);
@@ -98,34 +97,36 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
       (response) => response.url().includes("/contacts") && response.status() === 200,
       { timeout: 10_000 }
     );
-    await emailInput.press('Enter');
-    await page.getByTestId('add_recipients_step__continue_button').click();
-    
+    await emailInput.press("Enter");
+    await page.getByTestId("add_recipients_step__continue_button").click();
+
     // Wait for the editor iframe to load and become visible
-    const frameHandle = page.frameLocator('#kolas-editor-iframe');
-    await frameHandle.locator('body').waitFor();
+    const frameHandle = page.frameLocator("#kolas-editor-iframe");
+    await frameHandle.locator("body").waitFor();
 
     // 8. Click Review and send.
-    await frameHandle.getByTestId('split-main-button').click();
+    await frameHandle.getByTestId("split-main-button").click();
 
     // 9. When prompted about variables, select Do not replace (variables will be displayed) and click Continue.
     await frameHandle.locator('//span[contains(., "Do not replace")]').click();
-    await frameHandle.getByRole('button', { name: 'Continue' }).click();
+    await frameHandle.getByRole("button", { name: "Continue" }).click();
 
     // 10. Click Continue.
-    await frameHandle.getByTestId('continue-button').click();  
+    await frameHandle.getByTestId("continue-button").click();
 
     // 11. Click Send document.
-    await frameHandle.getByTestId('send-document-button').click();
+    await frameHandle.getByTestId("send-document-button").click();
 
     // 12. Verify the Document has been sent dialog appears.
-    const sentDialog = frameHandle.getByRole("dialog").filter({ hasText: /Document has been sent/i });
+    const sentDialog = frameHandle
+      .getByRole("dialog")
+      .filter({ hasText: /Document has been sent/i });
     await expect(sentDialog).toBeVisible({ timeout: 30_000 });
 
     // 13. Click the Close (X) icon on the dialog.
-    await sentDialog.getByTestId('close-dialog').click();
+    await sentDialog.getByTestId("close-dialog").click();
     await expect(sentDialog).toBeHidden();
-    
+
     // 14. Extract document links using Mailinator.
     const mailPage = await page.context().newPage();
     let documentUrl: string;
@@ -157,13 +158,13 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await acceptCookiesIfPresent(signingPage);
 
     // Best-effort signing flow (public token link pages can vary slightly).
-    await signingPage.getByTestId('info-bar-action-button').click();
-    
+    await signingPage.getByTestId("info-bar-action-button").click();
+
     // Try to adopt/confirm a signature if prompted.
-    await signingPage.getByTestId('signature-field').click();
-    
+    await signingPage.getByTestId("signature-field").click();
+
     // Try to click Accept and sign button
-    await signingPage.locator('#dialogPrimaryButton').click();
+    await signingPage.locator("#dialogPrimaryButton").click();
 
     // Wait for response from /field-image/upload
     await signingPage.waitForResponse(
@@ -172,10 +173,12 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     );
 
     // Click Finish button
-    await signingPage.getByTestId('info-bar-action-button').click();
+    await signingPage.getByTestId("info-bar-action-button").click();
 
     // Assert we didn't land on an error page.
-    await expect(signingPage.getByTestId('empty-state-title')).toHaveText('All set — this document is complete!');
+    await expect(signingPage.getByTestId("empty-state-title")).toHaveText(
+      "All set — this document is complete!"
+    );
     await signingPage.close();
 
     // 16. Verify signer received completed email using Mailinator.

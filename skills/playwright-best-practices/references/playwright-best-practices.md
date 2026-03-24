@@ -56,7 +56,10 @@ import { test, expect } from "@playwright/test";
 test("creates an invoice with a line item", async ({ page }) => {
   const testInfo = test.info();
   testInfo.annotations.push({ type: "feature", description: "Feature: Billing - Invoicing" });
-  testInfo.annotations.push({ type: "scenario", description: "Scenario: Create an invoice with a line item" });
+  testInfo.annotations.push({
+    type: "scenario",
+    description: "Scenario: Create an invoice with a line item"
+  });
   testInfo.annotations.push({
     type: "gherkin",
     description:
@@ -84,7 +87,7 @@ Patterns:
 
 ## 5) Fixtures and helpers
 
-- Use fixtures to share *setup*, not to hide assertions.
+- Use fixtures to share _setup_, not to hide assertions.
 - Keep helper functions pure where possible: pass in `page` and return values rather than mutating global state.
 - Use `test.step(...)` for multi-stage flows to improve trace readability.
 
@@ -133,7 +136,7 @@ test.afterEach(async ({ page }, testInfo) => {
   if (testInfo.status !== testInfo.expectedStatus) {
     await testInfo.attach("screenshot", {
       body: await page.screenshot(),
-      contentType: "image/png",
+      contentType: "image/png"
     });
   }
 });

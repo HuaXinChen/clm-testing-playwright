@@ -31,4 +31,3 @@ export function getAuthSkip(filePath: string): { skip: boolean; reason?: string 
 
   return { skip: false };
 }
-

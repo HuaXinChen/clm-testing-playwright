@@ -3,6 +3,7 @@
 This project demonstrates an end-to-end test strategy for a Contract Lifecycle Management (CLM) workflow using Playwright.
 
 It focuses on validating complex, asynchronous document workflows including:
+
 - Document creation from templates
 - Dynamic recipient handling
 - Email-based verification (Mailinator)
@@ -26,14 +27,14 @@ Playwright test project for `https://app.pandadoc.com/` (PandaDoc CLM).
 
 ## Quick start
 
-1) Install deps and browsers:
+1. Install deps and browsers:
 
 ```bash
 npm i
 npx playwright install --with-deps
 ```
 
-2) Run smoke tests (no auth required):
+2. Run smoke tests (no auth required):
 
 ```bash
 npm test smoke.spec.ts
@@ -53,19 +54,19 @@ Default endpoints live in `env.json` (override with `.env` if needed):
 
 ## Allure reporting
 
-1) Run tests (Allure results are written to `allure-results/`):
+1. Run tests (Allure results are written to `allure-results/`):
 
 ```bash
 npm test
 ```
 
-2) Generate a static report into `allure-report/`:
+2. Generate a static report into `allure-report/`:
 
 ```bash
 npm run allure:generate
 ```
 
-3) Open the report locally:
+3. Open the report locally:
 
 ```bash
 npm run allure:open
@@ -94,12 +95,12 @@ npm run auth
 
 If you’re starting from a brand-new PandaDoc account, complete the onboarding in the opened browser:
 
-1) Run `npm run auth`
-2) Choose **Google Login**
-3) Sign in with your Google account
-4) Choose the **Free** plan
-5) Choose **Job Offer Letter Template**
-6) When the browser lands on the **Discover** page, the auth session is saved to `auth.json`
+1. Run `npm run auth`
+2. Choose **Google Login**
+3. Sign in with your Google account
+4. Choose the **Free** plan
+5. Choose **Job Offer Letter Template**
+6. When the browser lands on the **Discover** page, the auth session is saved to `auth.json`
 
 Note: the auth script saves state when the URL matches `DASHBOARD_URL_PATTERN` from `.env`. If your tenant lands on Discover, set `DASHBOARD_URL_PATTERN=**/a/#/discover**` and re-run `npm run auth`.
 

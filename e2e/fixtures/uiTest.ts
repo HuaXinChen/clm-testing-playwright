@@ -14,4 +14,3 @@ test.afterEach(async ({ page }, testInfo) => {
     contentType: "text/plain"
   });
 });
-

@@ -1,48 +1,48 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
-    branches: [ main, master ]
+    branches: [main, master]
   workflow_dispatch:
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-    - uses: actions/setup-java@v4
-      with:
-        distribution: temurin
-        java-version: "17"
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright Browsers
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      id: playwright
-      continue-on-error: true
-      run: npx playwright test
-    - name: Generate Allure report
-      if: ${{ always() }}
-      continue-on-error: true
-      run: npm run allure:generate
-    - uses: actions/upload-artifact@v4
-      if: ${{ !cancelled() }}
-      with:
-        name: playwright-artifacts
-        path: |
-          playwright-report/
-          test-results/
-          allure-results/
-          allure-report/
-        retention-days: 30
-    - name: Fail if tests failed
-      if: ${{ steps.playwright.outcome == 'failure' }}
-      run: exit 1
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        id: playwright
+        continue-on-error: true
+        run: npx playwright test
+      - name: Generate Allure report
+        if: ${{ always() }}
+        continue-on-error: true
+        run: npm run allure:generate
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-artifacts
+          path: |
+            playwright-report/
+            test-results/
+            allure-results/
+            allure-report/
+          retention-days: 30
+      - name: Fail if tests failed
+        if: ${{ steps.playwright.outcome == 'failure' }}
+        run: exit 1
 
   deploy-allure:
     if: ${{ github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') }}
@@ -56,24 +56,24 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-    - uses: actions/configure-pages@v5
-    - uses: actions/download-artifact@v4
-      with:
-        name: playwright-artifacts
-        path: artifacts
-    - name: Check Allure report exists
-      id: allure_report
-      run: |
-        if [ -d artifacts/allure-report ]; then
-          echo "present=true" >> "$GITHUB_OUTPUT"
-        else
-          echo "present=false" >> "$GITHUB_OUTPUT"
-          echo "No artifacts/allure-report directory found; skipping GitHub Pages deploy."
-        fi
-    - uses: actions/upload-pages-artifact@v3
-      if: ${{ steps.allure_report.outputs.present == 'true' }}
-      with:
-        path: artifacts/allure-report
-    - id: deployment
-      if: ${{ steps.allure_report.outputs.present == 'true' }}
-      uses: actions/deploy-pages@v4
+      - uses: actions/configure-pages@v5
+      - uses: actions/download-artifact@v4
+        with:
+          name: playwright-artifacts
+          path: artifacts
+      - name: Check Allure report exists
+        id: allure_report
+        run: |
+          if [ -d artifacts/allure-report ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+            echo "No artifacts/allure-report directory found; skipping GitHub Pages deploy."
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        if: ${{ steps.allure_report.outputs.present == 'true' }}
+        with:
+          path: artifacts/allure-report
+      - id: deployment
+        if: ${{ steps.allure_report.outputs.present == 'true' }}
+        uses: actions/deploy-pages@v4

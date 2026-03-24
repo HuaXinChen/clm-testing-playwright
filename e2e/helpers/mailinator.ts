@@ -35,12 +35,20 @@ function getBySubjectText(page: Page, matcher: MailinatorLinkMatch): ReturnType<
   return page.getByText(matcher.value, { exact: false });
 }
 
-async function findMatchingRowText(page: Page, matcher: MailinatorLinkMatch): Promise<string | undefined> {
+async function findMatchingRowText(
+  page: Page,
+  matcher: MailinatorLinkMatch
+): Promise<string | undefined> {
   const tableRows = page.locator("table tbody tr");
   try {
     const count = await tableRows.count();
     for (let i = 0; i < count; i++) {
-      const text = (await tableRows.nth(i).innerText().catch(() => "")).trim();
+      const text = (
+        await tableRows
+          .nth(i)
+          .innerText()
+          .catch(() => "")
+      ).trim();
       if (matches(text, matcher)) return text;
     }
   } catch {
@@ -50,7 +58,12 @@ async function findMatchingRowText(page: Page, matcher: MailinatorLinkMatch): Pr
   const roleRows = page.locator('[role="row"]');
   const count = await roleRows.count();
   for (let i = 0; i < count; i++) {
-    const text = (await roleRows.nth(i).innerText().catch(() => "")).trim();
+    const text = (
+      await roleRows
+        .nth(i)
+        .innerText()
+        .catch(() => "")
+    ).trim();
     if (matches(text, matcher)) return text;
   }
 
@@ -61,7 +74,8 @@ export async function waitForMailinatorEmailSubject(
   page: Page,
   options: Pick<MailinatorLatestEmailOptions, "inbox" | "timeoutMs" | "pollIntervalMs" | "subject">
 ): Promise<string> {
-  if (!options.subject) throw new Error("waitForMailinatorEmailSubject: options.subject is required");
+  if (!options.subject)
+    throw new Error("waitForMailinatorEmailSubject: options.subject is required");
 
   const timeoutMs = options.timeoutMs ?? 60_000;
   const pollIntervalMs = options.pollIntervalMs ?? 5_000;
@@ -98,12 +112,19 @@ export async function waitForMailinatorEmailSubject(
   );
 }
 
-async function openLatestEmail(page: Page, subjectMatcher: MailinatorLinkMatch | undefined): Promise<void> {
+async function openLatestEmail(
+  page: Page,
+  subjectMatcher: MailinatorLinkMatch | undefined
+): Promise<void> {
   // Prefer clicking the subject text itself (Mailinator UIs often make the subject a link).
   if (subjectMatcher) {
     try {
       await getBySubjectText(page, subjectMatcher).first().click({ timeout: 15_000 });
-      await page.locator("iframe").first().waitFor({ state: "attached", timeout: 5_000 }).catch(() => {});
+      await page
+        .locator("iframe")
+        .first()
+        .waitFor({ state: "attached", timeout: 5_000 })
+        .catch(() => {});
       return;
     } catch {
       // Fall through to row-based strategies.
@@ -113,10 +134,19 @@ async function openLatestEmail(page: Page, subjectMatcher: MailinatorLinkMatch |
   const tableRows = page.locator("table tbody tr");
   try {
     await tableRows.first().waitFor({ state: "visible", timeout: 10_000 });
-    await tableRows.first().locator("a,button").first().click().catch(async () => {
-      await tableRows.first().click();
-    });
-    await page.locator("iframe").first().waitFor({ state: "attached", timeout: 5_000 }).catch(() => {});
+    await tableRows
+      .first()
+      .locator("a,button")
+      .first()
+      .click()
+      .catch(async () => {
+        await tableRows.first().click();
+      });
+    await page
+      .locator("iframe")
+      .first()
+      .waitFor({ state: "attached", timeout: 5_000 })
+      .catch(() => {});
     return;
   } catch {
     // Fall through to role-row strategy.
@@ -129,10 +159,19 @@ async function openLatestEmail(page: Page, subjectMatcher: MailinatorLinkMatch |
         hasText: subjectMatcher.type === "contains" ? subjectMatcher.value : subjectMatcher.value
       })
     : roleRows;
-  await clickable.first().locator("a,button").first().click().catch(async () => {
-    await clickable.first().click();
-  });
-  await page.locator("iframe").first().waitFor({ state: "attached", timeout: 5_000 }).catch(() => {});
+  await clickable
+    .first()
+    .locator("a,button")
+    .first()
+    .click()
+    .catch(async () => {
+      await clickable.first().click();
+    });
+  await page
+    .locator("iframe")
+    .first()
+    .waitFor({ state: "attached", timeout: 5_000 })
+    .catch(() => {});
 }
 
 async function extractLinksFromOpenEmail(page: Page): Promise<string[]> {

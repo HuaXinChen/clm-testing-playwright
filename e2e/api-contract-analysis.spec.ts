@@ -121,7 +121,8 @@ test("contract analysis API returns structured data", async ({ request }) => {
       "Given a contract analysis API endpoint\nWhen I submit valid contract text\nThen I receive structured contract analysis data"
   });
 
-  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
+  if (!baseURL)
+    test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
 
   const requestBody = {
     text: "This agreement is between Acme Corp and John Doe effective Jan 1, 2024."
@@ -155,14 +156,18 @@ test("contract analysis API returns structured data", async ({ request }) => {
 test("returns 400 for empty contract input", async ({ request }) => {
   const testInfo = test.info();
   testInfo.annotations.push({ type: "feature", description: "Feature: Contract analysis API" });
-  testInfo.annotations.push({ type: "scenario", description: "Scenario: Empty contract text is rejected" });
+  testInfo.annotations.push({
+    type: "scenario",
+    description: "Scenario: Empty contract text is rejected"
+  });
   testInfo.annotations.push({
     type: "gherkin",
     description:
       "Given a contract analysis API endpoint\nWhen I submit an empty contract text\nThen the API responds with a 400 error"
   });
 
-  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
+  if (!baseURL)
+    test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
 
   const requestBody = { text: "" };
   const response = await request.post(`${baseURL}/analyze-contract`, { data: requestBody });
