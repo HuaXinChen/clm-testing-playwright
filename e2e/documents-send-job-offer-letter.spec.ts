@@ -58,10 +58,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await page.getByTestId("surfaces-main-action").click();
 
     // 3. Choose Job Offer Letter Template.
-    await page
-      .getByRole('img', { name: 'Job Offer Letter Template' })
-      .nth(1)
-      .click();
+    await page.getByRole("img", { name: "Job Offer Letter Template" }).nth(1).click();
 
     // 4. Click Add 1 item.
     await page.getByRole("button", { name: /^Add 1 item$/i }).click();
@@ -76,9 +73,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     // 6. Click into the Add recipient text box.
     await page.getByTestId("person-actor-card").locator("input").click();
 
-    await page
-      .getByRole("button", { name: /create new recipient/i })
-      .click();
+    await page.getByRole("button", { name: /create new recipient/i }).click();
 
     // 7. In the Create new recipient dialog: fill First name, Last name, Email, leave Phone number empty, click Create.
     const createRecipientDialog = page
@@ -95,7 +90,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
       { timeout: 10_000 }
     );
     await emailInput.press("Enter");
-    await page.getByRole('button', { name: 'Continue' }).click();
+    await page.getByRole("button", { name: "Continue" }).click();
 
     // Wait for the editor iframe to load and become visible
     const frameHandle = page.frameLocator("#kolas-editor-iframe");
