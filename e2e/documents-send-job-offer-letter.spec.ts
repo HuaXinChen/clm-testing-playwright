@@ -79,7 +79,6 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await page.getByTestId("person-actor-card").locator("input").click();
 
     await page
-      .getByTestId("dropdown-menu")
       .getByRole("button", { name: /create new recipient/i })
       .click();
 
@@ -98,7 +97,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
       { timeout: 10_000 }
     );
     await emailInput.press("Enter");
-    await page.getByTestId("add_recipients_step__continue_button").click();
+    await page.getByRole('button', { name: 'Continue' }).click();
 
     // Wait for the editor iframe to load and become visible
     const frameHandle = page.frameLocator("#kolas-editor-iframe");
