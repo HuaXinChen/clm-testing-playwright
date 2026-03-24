@@ -20,6 +20,9 @@
 
 ## 2) Config defaults
 
+- Use Allure for reporting:
+  - Configure `allure-playwright` in `reporter` (keep the HTML reporter too for quick local triage).
+  - Write Allure results to `allure-results/` and publish an Allure report artifact in CI.
 - Use artifacts that help debugging flakes:
   - `trace: "on-first-retry"`
   - `screenshot: "only-on-failure"`
@@ -33,10 +36,35 @@
   - **One reason to fail** per test.
   - Clear arrange/act/assert flow.
   - Deterministic data (seeded or explicitly created) rather than relying on ambient state.
+- Playwright annotations are required for every test (use them for reporting and triage; do not call Allure APIs directly in tests):
+  - Add `feature` and `scenario` as annotations via `test.info().annotations`.
+  - Keep a Gherkin-style convention so reports read like specs:
+    - `feature`: `Feature: <domain/capability>`
+    - `scenario`: `Scenario: <behavior/outcome>`
+    - (Optional) `gherkin`: multi-line `Given/When/Then` text for the full scenario.
+  - Use a meaningful test title (it becomes your “default” Allure test name and is what you’ll scan first in reports).
 - Prefer asserting observable outcomes over internal implementation:
   - URL, headings, toasts, table rows, disabled states, etc.
 - Avoid global ordering:
   - No “depends on previous test”. If needed, factor shared setup into a fixture.
+
+Minimal pattern:
+
+```ts
+import { test, expect } from "@playwright/test";
+
+test("creates an invoice with a line item", async ({ page }) => {
+  const testInfo = test.info();
+  testInfo.annotations.push({ type: "feature", description: "Feature: Billing - Invoicing" });
+  testInfo.annotations.push({ type: "scenario", description: "Scenario: Create an invoice with a line item" });
+  testInfo.annotations.push({
+    type: "gherkin",
+    description:
+      "Given I am an authenticated user\nWhen I create an invoice with one line item\nThen the invoice is saved and visible in the list"
+  });
+  // ...
+});
+```
 
 ## 4) Locators and selectors
 
@@ -88,12 +116,28 @@ Safety:
 When a test flakes:
 
 - Check trace first; identify the first unexpected state transition.
+- Ensure every failure path attaches something actionable:
+  - UI failures: attach a screenshot (or rely on `screenshot: "only-on-failure"` plus an explicit attach when you catch/rethrow).
+  - API/assertion failures: attach the last relevant API response (status + body) as JSON/text.
 - Replace sleeps with assertions:
   - “wait for navigation”: `await expect(page).toHaveURL(...)`
   - “wait for fetch results”: assert the UI state change that indicates completion
   - “wait for dialog”: `await page.getByRole(...).waitFor()` (or `expect(...).toBeVisible()`)
 - Remove ambiguity:
   - Add scopes, use role-based locators, or introduce `data-testid` in the app if possible.
+
+Failure-attach pattern (works with both Playwright HTML and Allure reporters):
+
+```ts
+test.afterEach(async ({ page }, testInfo) => {
+  if (testInfo.status !== testInfo.expectedStatus) {
+    await testInfo.attach("screenshot", {
+      body: await page.screenshot(),
+      contentType: "image/png",
+    });
+  }
+});
+```
 
 ## 8) CI hardening
 
@@ -109,6 +153,7 @@ When a test flakes:
 
 - `node_modules/`
 - `playwright-report/`, `test-results/`, `blob-report/`
+- `allure-results/`, `allure-report/`
 - `playwright/.user-data/`, `playwright/.auth/`, `playwright/.cache/` (if used)
 - auth state file (e.g., `auth.json`)
 - `.env`

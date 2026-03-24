@@ -39,6 +39,28 @@ npx playwright install --with-deps
 npm test smoke.spec.ts
 ```
 
+## Allure reporting
+
+1) Run tests (Allure results are written to `allure-results/`):
+
+```bash
+npm test
+```
+
+2) Generate a static report into `allure-report/`:
+
+```bash
+npm run allure:generate
+```
+
+3) Open the report locally:
+
+```bash
+npm run allure:open
+```
+
+If `allure:generate` fails, ensure Java is installed and available on your PATH.
+
 ### Google login setup (Required)
 
 This repo’s auth flow is **manual Google sign-in** in a headed browser, then tests reuse the saved session cookies from `AUTH_STATE_PATH` (default: `auth.json`).

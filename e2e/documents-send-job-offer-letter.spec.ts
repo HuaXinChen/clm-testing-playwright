@@ -1,10 +1,10 @@
-import { test, expect } from "@playwright/test";
 import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
 import {
   extractDocumentLinksFromLatestMailinatorEmail,
   waitForMailinatorEmailSubject
 } from "./helpers/mailinator";
 import { randomInt } from "node:crypto";
+import { test, expect } from "./fixtures/uiTest";
 
 // spec: specs/documents-send-job-offer-letter.md
 // seed: e2e/seed.spec.ts
@@ -27,7 +27,19 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
   test.use({ storageState: authStatePath });
 
-  test("Send “Job Offer Letter Template” Document to a New Recipient", async ({ page, baseURL }) => {
+  test("send Job Offer Letter template to new recipient and complete signing", async ({ page, baseURL }) => {
+    const testInfo = test.info();
+    testInfo.annotations.push({ type: "feature", description: "Feature: Documents - Sending" });
+    testInfo.annotations.push({
+      type: "scenario",
+      description: "Scenario: Send “Job Offer Letter Template” to a new recipient"
+    });
+    testInfo.annotations.push({
+      type: "gherkin",
+      description:
+        "Given I am authenticated\nWhen I create a document from the Job Offer Letter template and send it to a new recipient\nThen the recipient can open the email link, sign, and a completion email is received"
+    });
+
     const base = (baseURL ?? "https://app.pandadoc.com").replace(/\/+$/, "");
     await page.goto(`${base}`, { waitUntil: "domcontentloaded" });
 

@@ -17,6 +17,8 @@ pnpm-debug.log*
 /playwright-report/
 /test-results/
 /blob-report/
+/allure-results/
+/allure-report/
 /.cache/
 playwright/.cache/
 playwright/.auth/

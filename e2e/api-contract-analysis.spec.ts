@@ -81,30 +81,96 @@ test.afterAll(async () => {
   await new Promise<void>((resolve) => server!.close(() => resolve()));
 });
 
-test("contract analysis API returns structured data", async ({ request }) => {
-  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
+async function attachApiResponse(
+  name: string,
+  testInfo: import("@playwright/test").TestInfo,
+  response: import("@playwright/test").APIResponse,
+  payload?: unknown
+): Promise<void> {
+  const contentType = response.headers()["content-type"] ?? "unknown";
+  const statusLine = `${response.status()} ${response.statusText()}`.trim();
+  const bodyText = await response.text();
+  await testInfo.attach(name, {
+    body: Buffer.from(
+      JSON.stringify(
+        {
+          status: statusLine,
+          contentType,
+          requestBody: payload,
+          body: bodyText
+        },
+        null,
+        2
+      ),
+      "utf8"
+    ),
+    contentType: "application/json"
+  });
+}
 
-  const response = await request.post(`${baseURL}/analyze-contract`, {
-    data: {
-      text: "This agreement is between Acme Corp and John Doe effective Jan 1, 2024."
-    }
+test("contract analysis API returns structured data", async ({ request }) => {
+  const testInfo = test.info();
+  testInfo.annotations.push({ type: "feature", description: "Feature: Contract analysis API" });
+  testInfo.annotations.push({
+    type: "scenario",
+    description: "Scenario: Analyze contract text returns structured fields"
+  });
+  testInfo.annotations.push({
+    type: "gherkin",
+    description:
+      "Given a contract analysis API endpoint\nWhen I submit valid contract text\nThen I receive structured contract analysis data"
   });
 
-  expect(response.status()).toBe(200);
+  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
+
+  const requestBody = {
+    text: "This agreement is between Acme Corp and John Doe effective Jan 1, 2024."
+  };
+  const response = await request.post(`${baseURL}/analyze-contract`, { data: requestBody });
+
+  try {
+    expect(response.status()).toBe(200);
+  } catch (err) {
+    await attachApiResponse("api-response", testInfo, response, requestBody);
+    throw err;
+  }
+
   const result = (await response.json()) as ContractAnalysisResponse;
 
-  expect(result.partyNames).toEqual(expect.arrayContaining(["Acme Corp"]));
-  if (result.effectiveDate) {
-    expect(result.effectiveDate).toMatch(/\d{4}-\d{2}-\d{2}/);
+  try {
+    expect(result.partyNames).toEqual(expect.arrayContaining(["Acme Corp"]));
+    if (result.effectiveDate) {
+      expect(result.effectiveDate).toMatch(/\d{4}-\d{2}-\d{2}/);
+    }
+  } catch (err) {
+    await attachApiResponse("api-response", testInfo, response, requestBody);
+    await testInfo.attach("parsed-result", {
+      body: Buffer.from(JSON.stringify(result, null, 2), "utf8"),
+      contentType: "application/json"
+    });
+    throw err;
   }
 });
 
 test("returns 400 for empty contract input", async ({ request }) => {
-  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
-
-  const response = await request.post(`${baseURL}/analyze-contract`, {
-    data: { text: "" }
+  const testInfo = test.info();
+  testInfo.annotations.push({ type: "feature", description: "Feature: Contract analysis API" });
+  testInfo.annotations.push({ type: "scenario", description: "Scenario: Empty contract text is rejected" });
+  testInfo.annotations.push({
+    type: "gherkin",
+    description:
+      "Given a contract analysis API endpoint\nWhen I submit an empty contract text\nThen the API responds with a 400 error"
   });
 
-  expect(response.status()).toBe(400);
+  if (!baseURL) test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
+
+  const requestBody = { text: "" };
+  const response = await request.post(`${baseURL}/analyze-contract`, { data: requestBody });
+
+  try {
+    expect(response.status()).toBe(400);
+  } catch (err) {
+    await attachApiResponse("api-response", testInfo, response, requestBody);
+    throw err;
+  }
 });

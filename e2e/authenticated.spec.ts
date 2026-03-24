@@ -1,5 +1,5 @@
-import { test, expect } from "@playwright/test";
 import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
+import { test, expect } from "./fixtures/uiTest";
 
 test.describe("authenticated", () => {
   const authStatePath = getAuthStatePath();
@@ -8,6 +8,15 @@ test.describe("authenticated", () => {
   test.use({ storageState: authStatePath });
 
   test("authenticated session reaches app without login prompt", async ({ page, baseURL }) => {
+    const testInfo = test.info();
+    testInfo.annotations.push({ type: "feature", description: "Feature: Authentication" });
+    testInfo.annotations.push({ type: "scenario", description: "Scenario: Reuse storageState to access the app" });
+    testInfo.annotations.push({
+      type: "gherkin",
+      description:
+        "Given I have an auth storageState\nWhen I navigate to the Discover page\nThen I am not redirected to a login page"
+    });
+
     const base = (baseURL ?? "https://app.pandadoc.com").replace(/\/+$/, "");
     const expectedDiscoverUrl = `${base}/a/#/discover`;
     await page.goto(expectedDiscoverUrl, { waitUntil: "domcontentloaded" });
