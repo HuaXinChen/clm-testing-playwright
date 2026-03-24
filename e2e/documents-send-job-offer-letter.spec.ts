@@ -3,7 +3,6 @@ import {
   extractDocumentLinksFromLatestMailinatorEmail,
   waitForMailinatorEmailSubject
 } from "./helpers/mailinator";
-import { randomInt } from "node:crypto";
 import { test, expect } from "./fixtures/uiTest";
 
 // spec: specs/documents-send-job-offer-letter.md
@@ -71,7 +70,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
     // 5. In the document name field, enter Job Offer Letter for John Doe.
     const documentName = "Job Offer Letter for John Doe";
-    const mailinatorSuffix = String(randomInt(0, 1_000_000_000_000)).padStart(12, "0");
+    const mailinatorSuffix = String(Math.floor(Date.now() / 1000));
     const mailinatorInbox = `wd_tester_${mailinatorSuffix}`;
     const recipientEmail = `${mailinatorInbox}@mailinator.com`;
     await page.getByTestId("document-name-wizard").locator("input").fill(documentName);
