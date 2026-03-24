@@ -58,7 +58,13 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await page.getByTestId("surfaces-main-action").click();
 
     // 3. Choose Job Offer Letter Template.
-    await page.getByRole("img", { name: "Job Offer Letter Template" }).nth(1).click();
+    // await page.getByRole("img", { name: "Job Offer Letter Template" }).first().click();
+    await page
+      .getByRole("img", {
+        name: "Job Offer Letter Template",
+        exact: true
+      })
+      .click();
 
     // 4. Click Add 1 item.
     await page.getByRole("button", { name: /^Add 1 item$/i }).click();
