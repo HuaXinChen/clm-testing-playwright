@@ -98,8 +98,8 @@ If you’re starting from a brand-new PandaDoc account, complete the onboarding 
 1. Run `npm run auth`
 2. Choose **Google Login**
 3. Sign in with your Google account
-4. Choose the **Free** plan
-5. Choose **Job Offer Letter Template**
+4. Choose the **I need a repeatable process for sending documents regularly**
+5. Choose **Offer Letters** from HR documents and contracts
 6. When the browser lands on the **Discover** page, the auth session is saved to `auth.json`
 
 Note: the auth script saves state when the URL matches `DASHBOARD_URL_PATTERN` from `.env`. If your tenant lands on Discover, set `DASHBOARD_URL_PATTERN=**/a/#/discover**` and re-run `npm run auth`.

@@ -59,10 +59,8 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
 
     // 3. Choose Job Offer Letter Template.
     await page
-      .getByRole("button", { name: /Job Offer Letter Template/i })
-      .or(page.getByRole("link", { name: /Job Offer Letter Template/i }))
-      .or(page.getByText(/Job Offer Letter Template/i))
-      .first()
+      .getByRole('img', { name: 'Job Offer Letter Template' })
+      .nth(1)
       .click();
 
     // 4. Click Add 1 item.
