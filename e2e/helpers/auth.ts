@@ -7,8 +7,10 @@ export function getAuthStatePath(): string {
 export function storageStateHasCookies(filePath: string): boolean {
   try {
     const raw = readFileSync(filePath, "utf-8");
-    const parsed = JSON.parse(raw) as { cookies?: unknown };
-    return Array.isArray((parsed as any).cookies) && (parsed as any).cookies.length > 0;
+    const parsed = JSON.parse(raw) as unknown;
+    if (!parsed || typeof parsed !== "object") return false;
+    const cookies = (parsed as { cookies?: unknown }).cookies;
+    return Array.isArray(cookies) && cookies.length > 0;
   } catch {
     return false;
   }

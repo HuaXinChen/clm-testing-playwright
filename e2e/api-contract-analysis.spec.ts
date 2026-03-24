@@ -40,8 +40,8 @@ test.beforeAll(async () => {
         return;
       }
 
-      const body = (await readJsonBody(req)) as any;
-      const text = typeof body?.text === "string" ? body.text : "";
+      const body = (await readJsonBody(req)) as { text?: unknown };
+      const text = typeof body.text === "string" ? body.text : "";
       if (text.trim().length === 0) {
         res.writeHead(400, { "content-type": "application/json" });
         res.end(JSON.stringify({ error: "Missing `text`" }));
