@@ -4,6 +4,7 @@ import {
   waitForMailinatorEmailSubject
 } from "./helpers/mailinator";
 import { test, expect } from "./fixtures/uiTest";
+import { createTestPerson, createMailinatorInbox } from "./fixtures/testData";
 
 // spec: specs/documents-send-job-offer-letter.md
 // seed: e2e/seed.spec.ts
@@ -68,11 +69,10 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     // 4. Click Add 1 item.
     await page.getByRole("button", { name: /^Add 1 item$/i }).click();
 
-    // 5. In the document name field, enter Job Offer Letter for John Doe.
-    const documentName = "Job Offer Letter for John Doe";
-    const mailinatorSuffix = String(Math.floor(Date.now() / 1000));
-    const mailinatorInbox = `wd_tester_${mailinatorSuffix}`;
+    const testPerson = createTestPerson();
+    const mailinatorInbox = createMailinatorInbox();
     const recipientEmail = `${mailinatorInbox}@mailinator.com`;
+    const documentName = `Job Offer Letter for ${testPerson.fullName}`;
     await page.getByTestId("document-name-wizard").locator("input").fill(documentName);
 
     // 6. Click into the Add recipient text box.
@@ -85,8 +85,11 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
       .getByRole("dialog")
       .filter({ hasText: "Create new recipient" });
     await expect(createRecipientDialog).toBeVisible();
-    await createRecipientDialog.getByTestId("firstName").locator("input").fill("John");
-    await createRecipientDialog.getByTestId("lastName").locator("input").fill("Doe");
+    await createRecipientDialog
+      .getByTestId("firstName")
+      .locator("input")
+      .fill(testPerson.firstName);
+    await createRecipientDialog.getByTestId("lastName").locator("input").fill(testPerson.lastName);
     const emailInput = createRecipientDialog.locator('input[name^="searchField"]').first();
     await emailInput.click();
     await emailInput.fill(recipientEmail);

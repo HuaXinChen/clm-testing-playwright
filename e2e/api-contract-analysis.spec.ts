@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import * as http from "node:http";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import { createContractData } from "./fixtures/testData";
 
 type ContractAnalysisResponse = {
   partyNames: string[];
@@ -29,8 +30,10 @@ function readJsonBody(req: IncomingMessage): Promise<unknown> {
 let server: http.Server | undefined;
 let baseURL: string | undefined;
 let serverStartError: string | undefined;
+let mockContractData: ReturnType<typeof createContractData>;
 
 test.beforeAll(async () => {
+  mockContractData = createContractData();
   // API-only suite: keep real `request` calls, but serve a mocked response without launching a browser.
   server = http.createServer(async (req: IncomingMessage, res: ServerResponse) => {
     try {
@@ -49,9 +52,9 @@ test.beforeAll(async () => {
       }
 
       const payload: ContractAnalysisResponse = {
-        partyNames: ["Acme Corp", "John Doe"],
-        effectiveDate: "2024-01-01",
-        riskFlags: ["auto-renewal"]
+        partyNames: mockContractData.partyNames,
+        effectiveDate: mockContractData.effectiveDate,
+        riskFlags: mockContractData.riskFlags
       };
 
       res.writeHead(200, { "content-type": "application/json" });
@@ -125,7 +128,7 @@ test("contract analysis API returns structured data", async ({ request }) => {
     test.skip(true, `Unable to start local mock server: ${serverStartError ?? "unknown"}`);
 
   const requestBody = {
-    text: "This agreement is between Acme Corp and John Doe effective Jan 1, 2024."
+    text: `This agreement is between ${mockContractData.company.name} and ${mockContractData.person.fullName} effective ${mockContractData.effectiveDate}.`
   };
   const response = await request.post(`${baseURL}/analyze-contract`, { data: requestBody });
 
@@ -139,7 +142,7 @@ test("contract analysis API returns structured data", async ({ request }) => {
   const result = (await response.json()) as ContractAnalysisResponse;
 
   try {
-    expect(result.partyNames).toEqual(expect.arrayContaining(["Acme Corp"]));
+    expect(result.partyNames).toEqual(expect.arrayContaining([mockContractData.company.name]));
     if (result.effectiveDate) {
       expect(result.effectiveDate).toMatch(/\d{4}-\d{2}-\d{2}/);
     }
