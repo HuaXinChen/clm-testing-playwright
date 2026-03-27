@@ -18,7 +18,8 @@
     "allure:generate": "allure generate allure-results --clean -o allure-report",
     "allure:open": "allure open allure-report",
     "allure:serve": "allure serve allure-results",
-    "codegen": "playwright codegen $BASE_URL"
+    "codegen": "playwright codegen $BASE_URL",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.4.0",
@@ -30,8 +31,17 @@
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "globals": "^15.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
     "prettier": "^3.0.0",
-    "typescript-eslint": "^8.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "typescript-eslint": "^8.0.0"
+  },
+  "lint-staged": {
+    "**/*.{ts,js,json}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.ts": "tsc -p tsconfig.json --noEmit"
   }
 }
