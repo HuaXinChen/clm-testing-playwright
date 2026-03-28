@@ -10,7 +10,7 @@
   2. Present the commit message
   3. Wait for user confirmation: "[yes/no]"
 - **NEVER** auto-commit without user approval
-- Exception: Only if user explicitly says "commit this"
+- Even if user gives verbal approval (e.g., "go ahead"), still show status/diff and wait for explicit "[yes/no]" confirmation
 
 ### Push Rule
 
