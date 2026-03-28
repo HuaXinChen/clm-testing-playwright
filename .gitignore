@@ -14,6 +14,7 @@ pnpm-debug.log*
 .idea/
 
 # Playwright artifacts
+/playwright/
 /playwright-report/
 /test-results/
 /blob-report/

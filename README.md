@@ -16,6 +16,79 @@ It focuses on validating complex, asynchronous document workflows including:
 - **End-to-end workflow validation** across multiple systems (UI + email)
 - **State reuse** via authenticated session storage
 
+## Project Structure
+
+```
+/
+├── .github/          # CI/CD workflows & AI agent definitions
+├── config/           # Environment configuration (env.ts, env.json)
+├── docs/             # Test specifications & feature documentation
+├── e2e/
+│   ├── ui/           # UI/Browser tests
+│   │   ├── smoke/    # Critical path smoke tests
+│   │   ├── auth/     # Authentication tests
+│   │   └── documents/ # Document workflow tests
+│   └── api/          # API/HTTP tests
+│       ├── smoke/    # API smoke tests
+│       └── contracts/ # Contract analysis API tests
+├── skills/           # AI agent skills (locator-audit, self-healing)
+├── src/
+│   ├── fixtures/     # Test fixtures & data generators
+│   └── helpers/      # Shared utilities (auth, mailinator)
+├── tools/            # Build & utility scripts
+├── playwright.config.ts
+└── tsconfig.json
+```
+
+### Directory Details
+
+| Directory            | Purpose                         | When to Use                                                                |
+| -------------------- | ------------------------------- | -------------------------------------------------------------------------- |
+| `e2e/ui/`            | UI/Browser test specifications  | All browser-based tests                                                    |
+| `e2e/ui/smoke/`      | Critical path smoke tests       | Fast feedback tests                                                        |
+| `e2e/ui/auth/`       | Authentication tests            | Login, session, auth flow tests                                            |
+| `e2e/ui/documents/`  | Document workflow tests         | Document creation, sending, signing                                        |
+| `e2e/api/`           | API/HTTP test specifications    | All API tests                                                              |
+| `e2e/api/smoke/`     | API smoke tests                 | Critical API endpoints                                                     |
+| `e2e/api/contracts/` | Contract analysis API tests     | Contract API validation                                                    |
+| `src/fixtures/`      | Test data generators & fixtures | Reusable test data (e.g., `createTestPerson()`, `createMailinatorInbox()`) |
+| `src/helpers/`       | Utility functions               | Auth state, email handling, API helpers                                    |
+| `docs/`              | Feature specifications          | Markdown docs for test scenarios                                           |
+| `skills/`            | AI agent skills                 | Self-healing, locator auditing                                             |
+| `tools/`             | Scripts                         | Auth setup, seeding, utilities                                             |
+| `config/`            | Environment config              | Base URLs, environment variables                                           |
+
+### Test Tags
+
+Tests are tagged for flexible execution:
+
+- `@ui` - Browser-based UI tests
+- `@api` - HTTP/API tests
+- `@smoke` - Smoke tests (critical path)
+- `@auth` - Authentication tests
+- `@documents` - Document-related tests
+- `@contracts` - Contract-related tests
+
+### File Naming Conventions
+
+- Test specs: `*.spec.ts` (e.g., `smoke.spec.ts`, `send-job-offer-letter.spec.ts`)
+- Helpers: `*.ts` (e.g., `auth.ts`, `mailinator.ts`)
+- Fixtures: `*.ts` (e.g., `uiTest.ts`, `testData.ts`)
+- Scripts: `*.mjs` or `*.ts` (e.g., `create-auth-state.mjs`)
+
+### Running Tests
+
+| Command                                | Runs                    |
+| -------------------------------------- | ----------------------- |
+| `npx playwright test e2e/ui`           | All UI tests            |
+| `npx playwright test e2e/ui/smoke`     | UI smoke tests          |
+| `npx playwright test e2e/ui/auth`      | Authentication tests    |
+| `npx playwright test e2e/ui/documents` | Document workflow tests |
+| `npx playwright test e2e/api`          | All API tests           |
+| `npx playwright test e2e/api/smoke`    | API smoke tests         |
+| `npx playwright test --grep @smoke`    | All tests tagged @smoke |
+| `npx playwright test --grep @ui`       | All tests tagged @ui    |
+
 ## Why this matters
 
 CLM platforms involve distributed workflows and external dependencies (email delivery, document rendering, signing flows).  

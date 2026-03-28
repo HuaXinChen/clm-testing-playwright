@@ -1,5 +1,5 @@
-import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
-import { test, expect } from "./fixtures/uiTest";
+import { getAuthSkip, getAuthStatePath } from "../src/helpers/auth";
+import { test, expect } from "../src/fixtures/uiTest";
 
 test.describe("seed", () => {
   const authStatePath = getAuthStatePath();

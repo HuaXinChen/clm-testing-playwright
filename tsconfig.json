@@ -9,5 +9,11 @@
     "skipLibCheck": true,
     "resolveJsonModule": true
   },
-  "include": ["playwright.config.ts", "e2e/**/*.ts"]
+  "include": [
+    "playwright.config.ts",
+    "e2e/**/*.ts",
+    "src/**/*.ts",
+    "config/**/*.ts",
+    "tools/**/*.ts"
+  ]
 }

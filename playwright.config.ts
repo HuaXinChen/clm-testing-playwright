@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { defineConfig, devices } from "@playwright/test";
-import { getEnvConfig } from "./env";
+import { getEnvConfig } from "./config/env";
 
 const baseURL = getEnvConfig().pandadocBaseUrl;
 

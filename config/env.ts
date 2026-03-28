@@ -13,7 +13,7 @@ function normalizeBaseUrl(value: string): string {
 }
 
 function readEnvJson(): Partial<EnvConfig> {
-  const filePath = path.resolve(process.cwd(), "env.json");
+  const filePath = path.resolve(process.cwd(), "config", "env.json");
   try {
     const raw = readFileSync(filePath, "utf8");
     const parsed = JSON.parse(raw) as Partial<EnvConfig>;

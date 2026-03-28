@@ -1,5 +1,5 @@
 import type { Page } from "@playwright/test";
-import { getEnvConfig } from "../../env";
+import { getEnvConfig } from "../../config/env";
 
 export type MailinatorLinkMatch =
   | { type: "contains"; value: string }

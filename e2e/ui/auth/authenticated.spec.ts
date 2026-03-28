@@ -1,9 +1,10 @@
-import { getAuthSkip, getAuthStatePath } from "./helpers/auth";
-import { test, expect } from "./fixtures/uiTest";
+import { getAuthSkip, getAuthStatePath } from "../../../src/helpers/auth";
+import { test, expect } from "../../../src/fixtures/uiTest";
 
-test.describe("authenticated", () => {
+test.describe("@ui @auth", () => {
   const authStatePath = getAuthStatePath();
   const { skip, reason } = getAuthSkip(authStatePath);
+
   test.skip(skip, reason);
   test.use({ storageState: authStatePath });
 
@@ -24,14 +25,12 @@ test.describe("authenticated", () => {
     const expectedDiscoverUrl = `${base}/a/#/discover`;
     await page.goto(expectedDiscoverUrl, { waitUntil: "domcontentloaded" });
 
-    // If the auth state is valid, we should not land back on a login page.
     await expect(
       page,
       "Auth state did not produce a logged-in session. Re-run `npm run auth`."
     ).not.toHaveURL(/\/login\b|accounts\.google\.com/i);
     await expect(page).toHaveURL(/\/a\/#\/discover\b/i);
 
-    // Best-effort: app shell has rendered (not a blank/redirecting page).
     await expect(page.locator("body")).not.toBeEmpty();
   });
 });
