@@ -1,0 +1,7 @@
+interface:
+  display_name: "Pandadoc Test Self-Healer"
+  short_description: "Diagnoses and heals failing E2E tests with automated fixes and GitHub issue creation"
+  default_prompt: "/self-heal [test-file]"
+
+policy:
+  allow_implicit_invocation: true
