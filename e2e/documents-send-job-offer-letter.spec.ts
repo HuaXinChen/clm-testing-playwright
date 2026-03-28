@@ -12,7 +12,7 @@ import { createTestPerson, createMailinatorInbox } from "./fixtures/testData";
 const authStatePath = getAuthStatePath();
 
 async function acceptCookiesIfPresent(page: import("@playwright/test").Page): Promise<void> {
-  const acceptButton = page.locator("#onetrust-accept-btn-handler");
+  const acceptButton = page.getByRole("button", { name: /accept|cookies/i });
   try {
     await acceptButton.waitFor({ state: "visible", timeout: 5_000 });
     await acceptButton.click();
@@ -108,7 +108,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await frameHandle.getByTestId("split-main-button").click();
 
     // 9. When prompted about variables, select Do not replace (variables will be displayed) and click Continue.
-    await frameHandle.locator('//span[contains(., "Do not replace")]').click();
+    await frameHandle.getByText("Do not replace", { exact: false }).click();
     await frameHandle.getByRole("button", { name: "Continue" }).click();
 
     // 10. Click Continue.
@@ -164,7 +164,7 @@ test.describe("Send “Job Offer Letter Template” Document to a New Recipient"
     await signingPage.getByTestId("signature-field").click();
 
     // Try to click Accept and sign button
-    await signingPage.locator("#dialogPrimaryButton").click();
+    await signingPage.getByRole("button", { name: /accept|sign/i }).click();
 
     // Wait for response from /field-image/upload
     await signingPage.waitForResponse(

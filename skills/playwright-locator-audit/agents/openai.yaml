@@ -1,0 +1,7 @@
+interface:
+  display_name: "Playwright Locator Auditor"
+  short_description: "Run tests, analyze locators, and convert to best-practice patterns"
+  default_prompt: "/audit-locators [test-file]"
+
+policy:
+  allow_implicit_invocation: true

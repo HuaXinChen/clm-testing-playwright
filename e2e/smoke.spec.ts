@@ -18,14 +18,7 @@ test("unauthenticated user sees login UI", async ({ page, baseURL }) => {
   // The app typically redirects to a login page if unauthenticated.
   await expect(page).toHaveURL(/pandadoc\.com/i);
 
-  const emailInput = page.locator('input[type="email"], input[name="email"], input[id*="email" i]');
-  const passwordInput = page.locator(
-    'input[type="password"], input[name="password"], input[id*="password" i]'
-  );
-
-  try {
-    await expect(emailInput).toBeVisible({ timeout: 30_000 });
-  } catch {
-    await expect(passwordInput).toBeVisible({ timeout: 30_000 });
-  }
+  await expect(page.getByRole("heading", { name: /log in to pandadoc/i })).toBeVisible({
+    timeout: 30_000
+  });
 });
